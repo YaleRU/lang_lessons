@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from "react"
 import { CheatSheet } from "./components/CheatSheet.tsx"
 import { HomeView } from "./components/HomeView.tsx"
+import { MatrixView } from "./components/MatrixView.tsx"
 import { LexiconView } from "./components/LexiconView.tsx"
 import { LessonView } from "./components/LessonView.tsx"
 import { Romanization } from "./components/Romanization.tsx"
 import { ToneModuleView } from "./components/ToneModuleView.tsx"
 import { COURSE } from "./data/course.ts"
+import { MATRIX_LAYERS } from "./data/matrix.ts"
 import { TONE_STEPS } from "./data/tones.ts"
 import { clampStep, lessonSteps } from "./lib/lessonSteps.ts"
 import { parseHash, resolveScreen, screenHash, type Screen } from "./lib/nav.ts"
@@ -21,10 +23,12 @@ import {
   readLesson,
   readLessonStep,
   readTheme,
+  readMatrixReached,
   readToneReached,
   writeGender,
   writeLesson,
   writeLessonStep,
+  writeMatrixReached,
   writeTheme,
   writeToneReached,
   type ThemeChoice,
@@ -37,6 +41,7 @@ export default function App() {
   const [gender, setGender] = useState(readGender)
   const [theme, setTheme] = useState<ThemeChoice>(readTheme)
   const [toneReached, setToneReached] = useState(readToneReached)
+  const [matrixReached, setMatrixReached] = useState(readMatrixReached)
   const [voiceHint, setVoiceHint] = useState("")
   const [viewGeneration, setViewGeneration] = useState(0)
   const opener = useRef<HTMLElement | null>(null)
@@ -60,7 +65,10 @@ export default function App() {
   }, [theme])
 
   useEffect(() => {
-    document.body.classList.toggle("has-continue", screen.name === "lesson" || screen.name === "tones")
+    document.body.classList.toggle(
+      "has-continue",
+      screen.name === "lesson" || screen.name === "tones" || screen.name === "matrix",
+    )
   }, [screen.name])
 
   useEffect(() => {
@@ -133,6 +141,9 @@ export default function App() {
     if (next.name === "tones") {
       return { name: "tones", step: Math.min(Math.max(0, next.step), TONE_STEPS.length - 1) }
     }
+    if (next.name === "matrix") {
+      return { name: "matrix", layer: Math.min(Math.max(0, next.layer), MATRIX_LAYERS.length - 1) }
+    }
     return next
   }
 
@@ -144,6 +155,10 @@ export default function App() {
     if (next.name === "tones") {
       writeToneReached(next.step)
       setToneReached(readToneReached())
+    }
+    if (next.name === "matrix") {
+      writeMatrixReached(next.layer)
+      setMatrixReached(readMatrixReached())
     }
   }
 
@@ -189,7 +204,11 @@ export default function App() {
   }
 
   const nav = [
-    { name: "Уроки", current: screen.name === "home" || screen.name === "lesson", go: () => go({ name: "home" }) },
+    {
+      name: "Уроки",
+      current: screen.name === "home" || screen.name === "lesson" || screen.name === "matrix",
+      go: () => go({ name: "home" }),
+    },
     {
       name: "Тоны",
       current: screen.name === "tones",
@@ -234,7 +253,24 @@ export default function App() {
           {voiceHint}
         </p>
         <main id="app">
-          {screen.name === "tones" ? (
+          {screen.name === "matrix" ? (
+            <MatrixView
+              layer={screen.layer}
+              gender={gender}
+              onHome={() => go({ name: "home" })}
+              onLayer={(layer) => {
+                if (layer >= MATRIX_LAYERS.length) {
+                  writeMatrixReached(MATRIX_LAYERS.length)
+                  setMatrixReached(readMatrixReached())
+                  go({ name: "home" })
+                  return
+                }
+                go({ name: "matrix", layer })
+              }}
+              onLesson={(id) => go({ name: "lesson", id, step: readLessonStep(id) })}
+              onSpeak={onSpeak}
+            />
+          ) : screen.name === "tones" ? (
             <ToneModuleView
               step={Math.min(screen.step, TONE_STEPS.length - 1)}
               onStep={(step) => go({ name: "tones", step })}
@@ -258,6 +294,7 @@ export default function App() {
               lastLesson={readLesson()}
               stepOf={readLessonStep}
               toneReached={toneReached}
+              matrixReached={matrixReached}
               onOpen={go}
               onSpeak={onSpeak}
             />

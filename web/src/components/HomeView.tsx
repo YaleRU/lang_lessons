@@ -1,47 +1,81 @@
 import { COURSE } from "../data/course.ts"
+import { MATRIX_LAYERS } from "../data/matrix.ts"
 import { TONE_STEPS } from "../data/tones.ts"
 import { lessonSteps } from "../lib/lessonSteps.ts"
 import type { Screen } from "../lib/nav.ts"
 import { Readable } from "./Readable.tsx"
+import { Romanization } from "./Romanization.tsx"
 
 export function HomeView({
   lastLesson,
   stepOf,
   toneReached,
+  matrixReached,
   onOpen,
   onSpeak,
 }: {
   lastLesson: number | null
   stepOf: (id: number) => number
   toneReached: number
+  matrixReached: number
   onOpen: (screen: Screen) => void
   onSpeak: (text: string) => void
 }) {
-  const tonesLeft = toneReached < TONE_STEPS.length - 1
-  const lesson = COURSE.find((item) => item.id === lastLesson) ?? null
-  const continueScreen: Screen = tonesLeft
-    ? { name: "tones", step: toneReached }
-    : { name: "lesson", id: lesson?.id ?? 1, step: lesson ? stepOf(lesson.id) : 0 }
-  const continueWhere = tonesLeft
-    ? `Тоны. ${TONE_STEPS[toneReached]?.title ?? "Начало"}`
-    : lesson
-      ? `Урок ${lesson.id}. ${lesson.title}`
-      : `Урок 1. ${COURSE[0]?.title ?? ""}`
+  const done = matrixReached >= MATRIX_LAYERS.length
+  const here = done ? 0 : Math.max(0, matrixReached)
+  const layer = MATRIX_LAYERS[here]
+  const continueWhere = done
+    ? "Матрица пройдена. Повторить с лиц"
+    : matrixReached < 0
+      ? `Слой А. ${MATRIX_LAYERS[0]?.title ?? ""}`
+      : `Слой ${layer?.id ?? "A"}. ${layer?.title ?? ""}`
 
   return (
     <>
-      <p className="kicker">{COURSE.length} речевых задач</p>
-      <h1>Сначала сказать.</h1>
+      <p className="kicker">Одна матрица</p>
+      <h1>Сначала одни и те же фразы.</h1>
+      <p>Три глагола, одни буквы. Сначала лица и да или нет. Потом слово времени. Потом частицы. Уроки ниже повторяют эти клетки.</p>
+      <p className="row">
+        <button className="speak" type="button" lang="th" aria-label="слушать รัก, rák, любить" onClick={() => onSpeak("รัก")}>
+          <span className="thai" lang="th">รัก</span> <Romanization rom="rák" inline />
+        </button>
+        <button className="speak" type="button" lang="th" aria-label="слушать กิน, gin, есть" onClick={() => onSpeak("กิน")}>
+          <span className="thai" lang="th">กิน</span> <Romanization rom="gin" inline />
+        </button>
+        <button className="speak" type="button" lang="th" aria-label="слушать ไป, bpai, идти" onClick={() => onSpeak("ไป")}>
+          <span className="thai" lang="th">ไป</span> <Romanization rom="bpai" inline />
+        </button>
+      </p>
       <p>
         <Readable
           text="На уроке одна таблица и те же слова: да, нет, вопрос, вчера, завтра. Сверху выберите ผม или ฉัน. Буквы и схемы лежат в шпаргалке."
           onSpeak={onSpeak}
         />
       </p>
-      <button className="continue" type="button" onClick={() => onOpen(continueScreen)}>
+      <button className="continue" type="button" onClick={() => onOpen({ name: "matrix", layer: here })}>
         <b>Продолжить</b>
         <span>{continueWhere}</span>
       </button>
+      <section>
+        <h2>Слои</h2>
+        {MATRIX_LAYERS.map((item, index) => {
+          const state = done || matrixReached > index ? "пройден" : matrixReached === index ? "вы здесь" : ""
+          return (
+            <button
+              key={item.id}
+              className="lesson-link"
+              type="button"
+              onClick={() => onOpen({ name: "matrix", layer: index })}
+            >
+              <b>
+                {item.id}. {item.title}
+              </b>
+              <span>{item.lead}</span>
+              {state ? <i className="state">{state}</i> : null}
+            </button>
+          )
+        })}
+      </section>
       <section>
         <h2>Основы произношения</h2>
         <button className="lesson-link" type="button" onClick={() => onOpen({ name: "tones", step: toneReached })}>
@@ -53,7 +87,7 @@ export function HomeView({
         </button>
       </section>
       <section>
-        <h2>Уроки речи</h2>
+        <h2>Практика. {COURSE.length} уроков</h2>
         {COURSE.map((item) => {
           const step = stepOf(item.id)
           const count = lessonSteps(item).length

@@ -3,6 +3,7 @@ const LESSON_KEY = "tp-lesson"
 const THEME_KEY = "tp-theme"
 const STEPS_KEY = "tp-steps"
 const TONE_KEY = "tp-tone-reached"
+const MATRIX_KEY = "tp-matrix-reached"
 const WORDS_KEY = "tp-words-tab"
 
 export type ThemeChoice = "light" | "dark" | "system"
@@ -97,6 +98,26 @@ export function writeToneReached(step: number) {
   try {
     const next = Math.max(readToneReached(), step)
     localStorage.setItem(TONE_KEY, String(next))
+  } catch {
+    /* исходник глотает сбой хранилища */
+  }
+}
+
+export function readMatrixReached(): number {
+  try {
+    const stored = localStorage.getItem(MATRIX_KEY)
+    if (stored == null) return -1
+    const value = Number(stored)
+    return Number.isInteger(value) && value >= 0 ? value : -1
+  } catch {
+    return -1
+  }
+}
+
+export function writeMatrixReached(layer: number) {
+  try {
+    const next = Math.max(readMatrixReached(), layer)
+    localStorage.setItem(MATRIX_KEY, String(next))
   } catch {
     /* исходник глотает сбой хранилища */
   }
