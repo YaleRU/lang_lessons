@@ -28,10 +28,14 @@ export default function App() {
   useEffect(() => {
     let startX = 0
     let startY = 0
+    let dismissFromBar = false
     const onStart = (event: TouchEvent) => {
       const touch = event.changedTouches[0]
       startX = touch.clientX
       startY = touch.clientY
+      const target = event.target
+      dismissFromBar =
+        target instanceof Element && Boolean(target.closest("#sheet .bar"))
     }
     const onEnd = (event: TouchEvent) => {
       const touch = event.changedTouches[0]
@@ -47,6 +51,7 @@ export default function App() {
         setSheetOpen(true)
       } else if (
         sheetOpenRef.current &&
+        dismissFromBar &&
         dy > 70 &&
         Math.abs(dy) > Math.abs(dx)
       ) {
@@ -146,7 +151,7 @@ export default function App() {
           </button>
         </div>
         <div className="body">
-          <CheatSheet />
+          <CheatSheet onSpeak={onSpeak} />
         </div>
       </div>
     </>
