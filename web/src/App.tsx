@@ -7,7 +7,6 @@ import { LessonView } from "./components/LessonView.tsx"
 import { Romanization } from "./components/Romanization.tsx"
 import { ToneModuleView } from "./components/ToneModuleView.tsx"
 import { COURSE } from "./data/course.ts"
-import { MATRIX_LAYERS } from "./data/matrix.ts"
 import { TONE_STEPS } from "./data/tones.ts"
 import { clampStep, lessonSteps } from "./lib/lessonSteps.ts"
 import { parseHash, resolveScreen, screenHash, type Screen } from "./lib/nav.ts"
@@ -67,7 +66,7 @@ export default function App() {
   useEffect(() => {
     document.body.classList.toggle(
       "has-continue",
-      screen.name === "lesson" || screen.name === "tones" || screen.name === "matrix",
+      screen.name === "lesson" || screen.name === "tones",
     )
   }, [screen.name])
 
@@ -141,9 +140,6 @@ export default function App() {
     if (next.name === "tones") {
       return { name: "tones", step: Math.min(Math.max(0, next.step), TONE_STEPS.length - 1) }
     }
-    if (next.name === "matrix") {
-      return { name: "matrix", layer: Math.min(Math.max(0, next.layer), MATRIX_LAYERS.length - 1) }
-    }
     return next
   }
 
@@ -157,7 +153,7 @@ export default function App() {
       setToneReached(readToneReached())
     }
     if (next.name === "matrix") {
-      writeMatrixReached(next.layer)
+      writeMatrixReached(1)
       setMatrixReached(readMatrixReached())
     }
   }
@@ -254,22 +250,7 @@ export default function App() {
         </p>
         <main id="app">
           {screen.name === "matrix" ? (
-            <MatrixView
-              layer={screen.layer}
-              gender={gender}
-              onHome={() => go({ name: "home" })}
-              onLayer={(layer) => {
-                if (layer >= MATRIX_LAYERS.length) {
-                  writeMatrixReached(MATRIX_LAYERS.length)
-                  setMatrixReached(readMatrixReached())
-                  go({ name: "home" })
-                  return
-                }
-                go({ name: "matrix", layer })
-              }}
-              onLesson={(id) => go({ name: "lesson", id, step: readLessonStep(id) })}
-              onSpeak={onSpeak}
-            />
+            <MatrixView gender={gender} onHome={() => go({ name: "home" })} onSpeak={onSpeak} />
           ) : screen.name === "tones" ? (
             <ToneModuleView
               step={Math.min(screen.step, TONE_STEPS.length - 1)}

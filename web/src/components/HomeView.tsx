@@ -1,10 +1,8 @@
 import { COURSE } from "../data/course.ts"
-import { MATRIX_LAYERS } from "../data/matrix.ts"
 import { TONE_STEPS } from "../data/tones.ts"
 import { lessonSteps } from "../lib/lessonSteps.ts"
 import type { Screen } from "../lib/nav.ts"
 import { Readable } from "./Readable.tsx"
-import { Romanization } from "./Romanization.tsx"
 
 export function HomeView({
   lastLesson,
@@ -21,60 +19,31 @@ export function HomeView({
   onOpen: (screen: Screen) => void
   onSpeak: (text: string) => void
 }) {
-  const done = matrixReached >= MATRIX_LAYERS.length
-  const here = done ? 0 : Math.max(0, matrixReached)
-  const layer = MATRIX_LAYERS[here]
-  const continueWhere = done
-    ? "Матрица пройдена. Повторить с лиц"
-    : matrixReached < 0
-      ? `Слой А. ${MATRIX_LAYERS[0]?.title ?? ""}`
-      : `Слой ${layer?.id ?? "A"}. ${layer?.title ?? ""}`
+  const opened = matrixReached >= 0
+  const continueWhere = opened ? "Таблица открыта. Любит Таиланд" : "Таблица. Любит Таиланд"
 
   return (
     <>
-      <p className="kicker">Одна матрица</p>
+      <p className="kicker">Одна таблица</p>
       <h1>Сначала одни и те же фразы.</h1>
-      <p>Три глагола, одни буквы. Сначала лица и да или нет. Потом слово времени. Потом частицы. Уроки ниже повторяют эти клетки.</p>
-      <p className="row">
-        <button className="speak" type="button" lang="th" aria-label="слушать รัก, rák, любить" onClick={() => onSpeak("รัก")}>
-          <span className="thai" lang="th">รัก</span> <Romanization rom="rák" inline />
-        </button>
-        <button className="speak" type="button" lang="th" aria-label="слушать กิน, gin, есть" onClick={() => onSpeak("กิน")}>
-          <span className="thai" lang="th">กิน</span> <Romanization rom="gin" inline />
-        </button>
-        <button className="speak" type="button" lang="th" aria-label="слушать ไป, bpai, идти" onClick={() => onSpeak("ไป")}>
-          <span className="thai" lang="th">ไป</span> <Romanization rom="bpai" inline />
-        </button>
-      </p>
+      <p>Один глагол รัก и одно слово «Таиланд». Шесть лиц. Вопрос, утверждение, отрицание. Будущее, настоящее, прошедшее. Уроки ниже — отдельная практика.</p>
       <p>
         <Readable
           text="На уроке одна таблица и те же слова: да, нет, вопрос, вчера, завтра. Сверху выберите ผม или ฉัน. Буквы и схемы лежат в шпаргалке."
           onSpeak={onSpeak}
         />
       </p>
-      <button className="continue" type="button" onClick={() => onOpen({ name: "matrix", layer: here })}>
+      <button className="continue" type="button" onClick={() => onOpen({ name: "matrix" })}>
         <b>Продолжить</b>
         <span>{continueWhere}</span>
       </button>
       <section>
-        <h2>Слои</h2>
-        {MATRIX_LAYERS.map((item, index) => {
-          const state = done || matrixReached > index ? "пройден" : matrixReached === index ? "вы здесь" : ""
-          return (
-            <button
-              key={item.id}
-              className="lesson-link"
-              type="button"
-              onClick={() => onOpen({ name: "matrix", layer: index })}
-            >
-              <b>
-                {item.id}. {item.title}
-              </b>
-              <span>{item.lead}</span>
-              {state ? <i className="state">{state}</i> : null}
-            </button>
-          )
-        })}
+        <h2>Таблица</h2>
+        <button className="lesson-link" type="button" onClick={() => onOpen({ name: "matrix" })}>
+          <b>Любит Таиланд</b>
+          <span>Девять клеток. В каждой шесть лиц: я, ты, мы, вы, он, она.</span>
+          {opened ? <i className="state">открыта</i> : null}
+        </button>
       </section>
       <section>
         <h2>Основы произношения</h2>

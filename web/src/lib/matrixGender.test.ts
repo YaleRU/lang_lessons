@@ -1,47 +1,40 @@
 import assert from "node:assert/strict"
 import { test } from "node:test"
-import { MATRIX_ROWS } from "../data/matrix.ts"
+import { loveCell } from "../data/matrix.ts"
 import { speakAs } from "./matrixGender.ts"
 
-const byId = (id: string) => {
-  const row = MATRIX_ROWS.find((item) => item.id === id)
-  if (!row) throw new Error(id)
-  return row
+const at = (time: "future" | "present" | "past", column: "question" | "statement" | "negation", person: string) => {
+  const line = loveCell(time, column).find((item) => item.person === person)
+  if (!line) throw new Error(person)
+  return line
 }
 
-test("female speaker keeps the three check phrases", () => {
-  const love = speakAs(byId("A-rak-i-you"), "f")
-  assert.equal(love.thai, "ฉันรักคุณค่ะ")
-  assert.equal(love.rom, "chǎn rák khun khâ")
-  assert.equal(love.ruRead, "чǎн ра́к кхун кхâ")
+test("female speaker changes я and the closing particle", () => {
+  const question = speakAs(at("future", "question", "Я"), "f")
+  assert.equal(question.thai, "ฉันจะรักประเทศไทยไหมคะ")
+  assert.equal(question.rom, "chǎn jà rák bprà-thêet-thai mǎi khá")
+  assert.equal(question.ruRead, "чǎн джà ра́к бпрà-тхêет-тхай мǎй кхá")
 
-  const not = speakAs(byId("A-rak-i-not"), "f")
-  assert.equal(not.thai, "ฉันไม่รักคุณค่ะ")
-  assert.equal(not.rom, "chǎn mâi rák khun khâ")
+  const statement = speakAs(at("present", "statement", "Я"), "f")
+  assert.equal(statement.thai, "ฉันรักประเทศไทยค่ะ")
+  assert.equal(statement.rom, "chǎn rák bprà-thêet-thai khâ")
+  assert.equal(statement.ruRead, "чǎн ра́к бпрà-тхêет-тхай кхâ")
 
-  const question = speakAs(byId("A-rak-you-me-q"), "f")
-  assert.equal(question.thai, "คุณรักฉันไหมคะ")
-  assert.equal(question.rom, "khun rák chǎn mǎi khá")
-  assert.equal(question.ruRead, "кхун ра́к чǎн мǎй кхá")
+  const past = speakAs(at("past", "negation", "Я"), "f")
+  assert.equal(past.thai, "เมื่อก่อนฉันไม่รักประเทศไทยค่ะ")
+  assert.equal(past.ru, "Раньше я не любила Таиланд.")
 })
 
-test("เขา does not choose the particle; the speaker does", () => {
-  const male = speakAs(byId("A-rak-he-you"), "m")
-  assert.equal(male.thai, "เขารักคุณครับ")
-  const female = speakAs(byId("A-rak-he-you"), "f")
-  assert.equal(female.thai, "เขารักคุณค่ะ")
-  assert.equal(female.rom, "khǎo rák khun khâ")
-  assert.ok(!female.thai.includes("ฉัน"))
+test("เขา stays the same word for him and for her", () => {
+  const he = speakAs(at("present", "statement", "Он"), "f")
+  const she = speakAs(at("present", "statement", "Она"), "f")
+  assert.equal(he.thai, "เขารักประเทศไทยค่ะ")
+  assert.equal(she.thai, he.thai)
+  assert.equal(he.rom, "khǎo rák bprà-thêet-thai khâ")
+  assert.equal(speakAs(at("present", "statement", "Он"), "m").thai, "เขารักประเทศไทยครับ")
 })
 
-test("a question word takes คะ", () => {
-  const row = speakAs(byId("E-where-to"), "f")
-  assert.equal(row.thai, "คุณไปไหนคะ")
-  assert.equal(row.rom, "khun bpai nǎi khá")
-})
-
-test("หรือยัง takes คะ", () => {
-  const row = speakAs(byId("C-q-already"), "f")
-  assert.equal(row.thai, "กินหรือยังคะ")
-  assert.equal(row.rom, "gin rʉ̌ʉ-yang khá")
+test("male lines stay as stored", () => {
+  const line = at("present", "statement", "Я")
+  assert.deepEqual(speakAs(line, "m"), line)
 })

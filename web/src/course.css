@@ -243,23 +243,57 @@ table.ref td, table.ref th { border-bottom: 1px solid var(--line); text-align: l
 .choice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .choice-grid .speak { display: flex; flex-direction: column; align-items: flex-start; height: auto; }
 .mark-list { padding-left: 18px; }
-.matrix-slots {
-  list-style: none;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin: 8px 0;
-  padding: 0;
-}
-.matrix-slots li {
+.love-scroll {
+  overflow: auto;
+  max-width: 100%;
+  max-height: 68dvh;
   border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 4px 8px;
-  min-width: 72px;
+  border-radius: 12px;
   background: var(--bg);
 }
-.matrix-slots i { display: block; font-style: normal; color: var(--muted); font-size: 12px; }
-.matrix-slots .thai { font-size: 1.05rem; }
+.love-grid {
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 860px;
+  width: max-content;
+}
+.love-grid caption {
+  caption-side: bottom;
+  text-align: left;
+  color: var(--muted);
+  font-size: 13px;
+  padding: 8px;
+}
+.love-grid th, .love-grid td {
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+  text-align: left;
+  background: var(--bg);
+  padding: 8px;
+}
+.love-grid thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--card);
+}
+.love-grid thead th:first-child, .love-grid tbody th {
+  position: sticky;
+  left: 0;
+  white-space: nowrap;
+  background: var(--card);
+}
+.love-grid thead th:first-child { z-index: 3; top: 0; }
+.love-grid tbody th { z-index: 1; }
+.love-grid ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.love-grid li { border-bottom: 1px solid var(--line); padding-bottom: 8px; }
+.love-grid li:last-child { border-bottom: 0; padding-bottom: 0; }
+.love-grid .thai { font-size: 1.25rem; white-space: nowrap; }
+.mark { font-size: 1.15rem; }
+.love-grid td { width: max-content; }
+.love-grid .rom { font-size: 0.95rem; }
+.love-grid .ru { color: var(--muted); font-size: 14px; }
 .recorder audio { display: block; width: 100%; margin-top: 8px; }
 :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) {
