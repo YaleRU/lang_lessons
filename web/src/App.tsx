@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import { CheatSheet } from "./components/CheatSheet.tsx"
 import { HomeView } from "./components/HomeView.tsx"
+import { LexiconView } from "./components/LexiconView.tsx"
 import { LessonView } from "./components/LessonView.tsx"
 import { Romanization } from "./components/Romanization.tsx"
 import { COURSE } from "./data/course.ts"
@@ -15,6 +16,7 @@ import { readGender, readLesson, writeGender, writeLesson } from "./lib/storage.
 export default function App() {
   const [gender, setGender] = useState(readGender)
   const [lessonId, setLessonId] = useState<number | null>(readLesson)
+  const [lexiconOpen, setLexiconOpen] = useState(false)
   const [voiceHint, setVoiceHint] = useState("")
   const [sheetOpen, setSheetOpen] = useState(false)
   const [viewGeneration, setViewGeneration] = useState(0)
@@ -69,8 +71,14 @@ export default function App() {
   }, [])
 
   const openLesson = (id: number | null) => {
+    setLexiconOpen(false)
     setLessonId(id)
     writeLesson(id)
+    window.scrollTo(0, 0)
+  }
+
+  const openLexicon = () => {
+    setLexiconOpen(true)
     window.scrollTo(0, 0)
   }
 
@@ -123,7 +131,9 @@ export default function App() {
         {voiceHint}
       </p>
       <div id="app">
-        {lesson ? (
+        {lexiconOpen ? (
+          <LexiconView onHome={() => openLesson(null)} onSpeak={onSpeak} />
+        ) : lesson ? (
           <LessonView
             key={`${lesson.id}:${gender}:${viewGeneration}`}
             lesson={lesson}
@@ -132,7 +142,7 @@ export default function App() {
             onSpeak={onSpeak}
           />
         ) : (
-          <HomeView onOpen={openLesson} onSpeak={onSpeak} />
+          <HomeView onOpen={openLesson} onLexicon={openLexicon} onSpeak={onSpeak} />
         )}
       </div>
       <div className="edge" id="edge" />

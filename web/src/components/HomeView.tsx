@@ -3,9 +3,11 @@ import { Readable } from "./Readable.tsx"
 
 export function HomeView({
   onOpen,
+  onLexicon,
   onSpeak,
 }: {
   onOpen: (id: number) => void
+  onLexicon: () => void
   onSpeak: (text: string) => void
 }) {
   return (
@@ -18,6 +20,10 @@ export function HomeView({
           onSpeak={onSpeak}
         />
       </p>
+      <button className="lesson-link" type="button" onClick={onLexicon}>
+        <b>Бытовые слова</b>
+        <span>Глаголы, существительные, прилагательные.</span>
+      </button>
       {COURSE.map((lesson) => (
         <button
           key={lesson.id}
