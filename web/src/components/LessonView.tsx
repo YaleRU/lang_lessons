@@ -1,6 +1,9 @@
 import { useState } from "react"
 import type { GenderedPhrase, Lesson } from "../data/types.ts"
 import { side } from "../lib/phrase.ts"
+import { resolveThai } from "../lib/readings.ts"
+import { HearButtons } from "./HearButtons.tsx"
+import { Readable } from "./Readable.tsx"
 import { Romanization } from "./Romanization.tsx"
 
 export function LessonView({
@@ -24,8 +27,12 @@ export function LessonView({
       </button>
       <p className="kicker">Урок {lesson.id} из 16</p>
       <h1>{lesson.title}</h1>
-      <p>{lesson.goal}</p>
-      <p className="muted">{lesson.petrov}</p>
+      <p>
+        <Readable text={lesson.goal} onSpeak={onSpeak} />
+      </p>
+      <p className="muted">
+        <Readable text={lesson.petrov} onSpeak={onSpeak} />
+      </p>
       <h2>Скажите сейчас</h2>
       <div className="card lead">
         {lesson.lead.ru ? <div className="ru muted">{lesson.lead.ru}</div> : null}
@@ -44,16 +51,33 @@ export function LessonView({
           <div className="thai">{word.th}</div>
           <Romanization rom={word.rom} />
           <div className="ru">{word.ru}</div>
-          <p className="how">{word.how}</p>
-          <button className="speak" type="button" onClick={() => onSpeak(word.th)}>
-            слушать слово
-          </button>
+          <div className="how">
+            <Readable text={word.how} onSpeak={onSpeak} />
+          </div>
+          <HearButtons
+            alone={word.th}
+            word={resolveThai(word.th).phrase}
+            onSpeak={onSpeak}
+            inLabel="в фразе"
+          />
         </article>
       ))}
-      <div className="formula">{lesson.formula}</div>
+      <div className="formula">
+        <Readable text={lesson.formula} onSpeak={onSpeak} />
+      </div>
+      {lesson.id === 8 ? (
+        <div className="formula">
+          <Readable
+            text="Спросить час: กี่โมง. В таблице час стоит готовой фразой перед тем же глаголом."
+            onSpeak={onSpeak}
+          />
+        </div>
+      ) : null}
       {lesson.note ? (
         <div className="card" style={{ padding: "12px 14px", margin: "10px 0" }}>
-          <p>{lesson.note}</p>
+          <p>
+            <Readable text={lesson.note} onSpeak={onSpeak} />
+          </p>
         </div>
       ) : null}
       {lesson.diagrams.map((diagram) => (
@@ -69,6 +93,14 @@ export function LessonView({
                     {spoken.th}
                   </div>
                   <Romanization rom={spoken.rom} />
+                  <div className="ru">{resolveThai(spoken.th).ru}</div>
+                  <HearButtons
+                    alone={spoken.th}
+                    word={resolveThai(spoken.th).phrase}
+                    onSpeak={onSpeak}
+                    compact
+                    inLabel="в фразе"
+                  />
                 </div>
               )
             })}
@@ -134,7 +166,9 @@ export function LessonView({
         )
       })}
       <h2>Теперь про себя</h2>
-      <p>{lesson.self}</p>
+      <p>
+        <Readable text={lesson.self} onSpeak={onSpeak} />
+      </p>
       <div className="row" style={{ marginTop: 16 }}>
         {lesson.id > 1 ? (
           <button
@@ -174,11 +208,10 @@ function TableCellView({
   return (
     <div className="cell">
       <div className="lab">{label}</div>
+      <div className="ru">{cell.ru}</div>
       <div className="thai">{spoken.th}</div>
       <Romanization rom={spoken.rom} />
-      <button className="speak" type="button" onClick={() => onSpeak(spoken.th)}>
-        слушать
-      </button>
+      <HearButtons alone={spoken.th} word={resolveThai(spoken.th).phrase} onSpeak={onSpeak} inLabel="в фразе" />
     </div>
   )
 }

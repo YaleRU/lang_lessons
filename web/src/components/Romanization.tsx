@@ -1,8 +1,9 @@
 import { romanizationParts, toneOf } from "../lib/romanization.ts"
 
-export function Romanization({ rom }: { rom: string }) {
+export function Romanization({ rom, inline = false }: { rom: string; inline?: boolean }) {
+  const Tag = inline ? "span" : "div"
   return (
-    <div className="rom">
+    <Tag className="rom">
       {romanizationParts(rom).map((part, index) =>
         part === "-" || /^\s+$/.test(part) ? (
           part
@@ -12,6 +13,6 @@ export function Romanization({ rom }: { rom: string }) {
           </span>
         ),
       )}
-    </div>
+    </Tag>
   )
 }

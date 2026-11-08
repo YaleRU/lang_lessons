@@ -1,6 +1,7 @@
 import { CONSONANTS, VOWELS, type Letter } from "../data/alphabet.ts"
 import { SCHEMAS, type SchemaLine } from "../data/schemas.ts"
 import { HearButtons } from "./HearButtons.tsx"
+import { Readable } from "./Readable.tsx"
 import { Romanization } from "./Romanization.tsx"
 
 export function CheatSheet({ onSpeak }: { onSpeak: (text: string) => void }) {
@@ -29,8 +30,12 @@ export function CheatSheet({ onSpeak }: { onSpeak: (text: string) => void }) {
       {SCHEMAS.map((schema) => (
         <section key={schema.title}>
           <h2>{schema.title}</h2>
-          <div className="formula">{schema.scheme}</div>
-          <p className="muted">{schema.universal}</p>
+          <div className="formula">
+            <Readable text={schema.scheme} onSpeak={onSpeak} />
+          </div>
+          <p className="muted">
+            <Readable text={schema.universal} onSpeak={onSpeak} />
+          </p>
           {schema.lines.map((line) => (
             <SchemaRow key={line.th} line={line} onSpeak={onSpeak} />
           ))}
@@ -113,7 +118,9 @@ function LetterRow({
       <div className="thai">{letter.th}</div>
       <Romanization rom={letter.rom} />
       <div className="ru">{letter.ru}</div>
-      <p className="how">{letter.how}</p>
+      <div className="how">
+        <Readable text={letter.how} onSpeak={onSpeak} />
+      </div>
       <div className="thai" style={{ fontSize: "1.15rem" }}>{letter.word}</div>
       <Romanization rom={letter.wordRom} />
       <HearButtons alone={letter.alone} word={letter.word} onSpeak={onSpeak} />

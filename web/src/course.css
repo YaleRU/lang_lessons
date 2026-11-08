@@ -79,6 +79,23 @@
   .cell .lab, .word .ru, .drill .ru { color: var(--muted); font-size: 14px; }
   .word + .word, .drill + .drill { margin-top: 8px; }
   .how { margin-top: 6px; }
+  .bit {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 4px;
+    flex-wrap: wrap;
+    margin: 0 2px;
+    padding-bottom: 1px;
+    border-bottom: 1px solid var(--line);
+  }
+  .bit .thai { font-size: 1.15rem; }
+  .bit .rom { font-size: 1rem; }
+  .bit .ru { font-size: 0.95rem; }
+  .bit .speak { padding: 1px 6px; font-size: 12px; }
+  .genders .thai { font-size: 1rem; }
+  .genders .rom { font-size: 0.95rem; }
+  .genders button.on .rom,
+  .genders button.on .rom .sy { color: inherit; }
   .formula { padding: 12px 14px; border-left: 3px solid var(--accent); margin: 8px 0 14px; }
   .grab {
     position: fixed; left: 0; right: 0; bottom: 0;

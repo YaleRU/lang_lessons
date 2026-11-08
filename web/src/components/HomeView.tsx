@@ -1,11 +1,23 @@
 import { COURSE } from "../data/course.ts"
+import { Readable } from "./Readable.tsx"
 
-export function HomeView({ onOpen }: { onOpen: (id: number) => void }) {
+export function HomeView({
+  onOpen,
+  onSpeak,
+}: {
+  onOpen: (id: number) => void
+  onSpeak: (text: string) => void
+}) {
   return (
     <>
       <p className="kicker">16 речевых задач</p>
       <h1>Сначала сказать.</h1>
-      <p>На уроке одна таблица и те же слова: да, нет, вопрос, вчера, завтра. Сверху выберите ผม или ฉัน. Буквы и схемы лежат в шпаргалке.</p>
+      <p>
+        <Readable
+          text="На уроке одна таблица и те же слова: да, нет, вопрос, вчера, завтра. Сверху выберите ผม или ฉัน. Буквы и схемы лежат в шпаргалке."
+          onSpeak={onSpeak}
+        />
+      </p>
       {COURSE.map((lesson) => (
         <button
           key={lesson.id}

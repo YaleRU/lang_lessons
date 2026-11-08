@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react"
 import { CheatSheet } from "./components/CheatSheet.tsx"
 import { HomeView } from "./components/HomeView.tsx"
 import { LessonView } from "./components/LessonView.tsx"
+import { Romanization } from "./components/Romanization.tsx"
 import { COURSE } from "./data/course.ts"
 import {
   MISSING_SPEECH_HINT,
@@ -103,14 +104,14 @@ export default function App() {
             className={gender === "m" ? "on" : undefined}
             onClick={() => chooseGender("m")}
           >
-            я ผม
+            я <span className="thai">ผม</span> <Romanization rom="phǒm" inline />
           </button>
           <button
             type="button"
             className={gender === "f" ? "on" : undefined}
             onClick={() => chooseGender("f")}
           >
-            я ฉัน
+            я <span className="thai">ฉัน</span> <Romanization rom="chǎn" inline />
           </button>
         </div>
       </header>
@@ -131,7 +132,7 @@ export default function App() {
             onSpeak={onSpeak}
           />
         ) : (
-          <HomeView onOpen={openLesson} />
+          <HomeView onOpen={openLesson} onSpeak={onSpeak} />
         )}
       </div>
       <div className="edge" id="edge" />
