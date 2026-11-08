@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { OPEN_LESSONS } from "../data/openLessons.ts"
 import type { GenderedPhrase, Lesson } from "../data/types.ts"
 import { side } from "../lib/phrase.ts"
 import { resolveThai } from "../lib/readings.ts"
@@ -65,14 +66,7 @@ export function LessonView({
       <div className="formula">
         <Readable text={lesson.formula} onSpeak={onSpeak} />
       </div>
-      {lesson.id === 8 ? (
-        <div className="formula">
-          <Readable
-            text="Спросить час: กี่โมง. В таблице час стоит готовой фразой перед тем же глаголом."
-            onSpeak={onSpeak}
-          />
-        </div>
-      ) : null}
+      <OpenLessonBlock lessonId={lesson.id} onSpeak={onSpeak} />
       {lesson.note ? (
         <div className="card" style={{ padding: "12px 14px", margin: "10px 0" }}>
           <p>
@@ -190,6 +184,37 @@ export function LessonView({
         ) : null}
       </div>
     </>
+  )
+}
+
+function OpenLessonBlock({
+  lessonId,
+  onSpeak,
+}: {
+  lessonId: number
+  onSpeak: (text: string) => void
+}) {
+  const item = OPEN_LESSONS.find((lesson) => lesson.id === lessonId)
+  if (!item) return null
+  return (
+    <section>
+      <h2>Фраза из открытого урока</h2>
+      <p className="muted">{item.source}</p>
+      <div className="formula">
+        <Readable text={item.schema} onSpeak={onSpeak} />
+      </div>
+      <div className="grid">
+        {item.rows.map((row) => (
+          <div className="cell" key={row.th}>
+            <div className="lab">{row.label}</div>
+            <div className="thai">{row.th}</div>
+            {row.rom ? <Romanization rom={row.rom} /> : <div className="ru">тон не сверен</div>}
+            <div className="ru">{row.ru}</div>
+            <HearButtons alone={row.th} onSpeak={onSpeak} />
+          </div>
+        ))}
+      </div>
+    </section>
   )
 }
 
