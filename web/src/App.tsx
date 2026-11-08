@@ -172,7 +172,10 @@ export default function App() {
   }
 
   const onSpeak = (text: string, options?: SpeakOptions) => {
-    const result = speak(text, options)
+    const result = speak(text, {
+      ...options,
+      onUnavailable: () => setVoiceHint(MISSING_VOICE_HINT),
+    })
     if (result === "missing-api") {
       setVoiceHint(MISSING_SPEECH_HINT)
       setViewGeneration((current) => current + 1)
