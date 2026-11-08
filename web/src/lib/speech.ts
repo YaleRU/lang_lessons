@@ -15,22 +15,27 @@ function thaiVoice(): SpeechSynthesisVoice | null {
   )
 }
 
-function utterance(text: string, voice: SpeechSynthesisVoice) {
+export type SpeakOptions = {
+  rate?: number
+  times?: number
+}
+
+function utterance(text: string, voice: SpeechSynthesisVoice, rate: number) {
   const result = new SpeechSynthesisUtterance(text)
   result.lang = "th-TH"
   result.voice = voice
-  result.rate = 0.8
+  result.rate = rate
   return result
 }
 
-function queue(parts: readonly string[]): SpeakResult {
+function queue(parts: readonly string[], rate = 0.85): SpeakResult {
   if (!window.speechSynthesis) return "missing-api"
   const voice = thaiVoice()
   if (!voice) return "missing-voice"
   window.speechSynthesis.cancel()
   for (const part of parts) {
     if (!part) continue
-    window.speechSynthesis.speak(utterance(part, voice))
+    window.speechSynthesis.speak(utterance(part, voice, rate))
   }
   return "spoken"
 }
@@ -43,10 +48,11 @@ export function primeVoices() {
   window.speechSynthesis.getVoices()
 }
 
-export function speak(text: string): SpeakResult {
-  return queue([text])
+export function speak(text: string, options?: SpeakOptions): SpeakResult {
+  const times = Math.max(1, options?.times ?? 1)
+  return queue(Array.from({ length: times }, () => text), options?.rate ?? 0.85)
 }
 
-export function speakSequence(parts: readonly string[]): SpeakResult {
-  return queue(parts)
+export function speakSequence(parts: readonly string[], options?: SpeakOptions): SpeakResult {
+  return queue(parts, options?.rate ?? 0.85)
 }

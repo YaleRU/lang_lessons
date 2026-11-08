@@ -13,11 +13,21 @@ export function HearButtons({
 }) {
   return (
     <span className="row" style={{ marginTop: compact ? 0 : 8 }}>
-      <button className="speak" type="button" onClick={() => onSpeak(alone)}>
+      <button
+        className="speak"
+        type="button"
+        aria-label={`отдельно: ${alone}`}
+        onClick={() => onSpeak(alone)}
+      >
         отдельно
       </button>
       {word ? (
-        <button className="speak" type="button" onClick={() => onSpeak(word)}>
+        <button
+          className="speak"
+          type="button"
+          aria-label={`${inLabel}: ${word}`}
+          onClick={() => onSpeak(word)}
+        >
           {inLabel}
         </button>
       ) : null}

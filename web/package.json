@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "node --experimental-strip-types --test src/lib/nav.test.ts src/data/course.test.ts src/data/tones.test.ts"
   },
   "dependencies": {
     "react": "^19.3.1",

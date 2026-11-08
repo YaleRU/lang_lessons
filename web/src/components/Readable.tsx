@@ -1,5 +1,4 @@
 import type { ReactNode } from "react"
-import { HearButtons } from "./HearButtons.tsx"
 import { Romanization } from "./Romanization.tsx"
 import { resolveThai } from "../lib/readings.ts"
 
@@ -28,20 +27,33 @@ export function Readable({
     const thai = marks[index]
     if (!thai) return
     const reading = resolveThai(thai)
+    const name = [thai, reading.rom, reading.ru].filter(Boolean).join(", ")
+    if (onSpeak && reading.status !== "sign") {
+      nodes.push(
+        <button
+          className="bit"
+          type="button"
+          lang="th"
+          key={`${thai}-${index}`}
+          aria-label={`слушать ${name}`}
+          onClick={() => onSpeak(reading.alone)}
+        >
+          <span className="thai" lang="th">
+            {thai}
+          </span>
+          {reading.rom ? <Romanization rom={reading.rom} inline /> : null}
+          <span className="ru">{reading.ru}</span>
+        </button>,
+      )
+      return
+    }
     nodes.push(
-      <span className="bit" key={`${thai}-${index}`}>
-        <span className="thai">{thai}</span>
+      <span className="bit" lang="th" key={`${thai}-${index}`}>
+        <span className="thai" lang="th">
+          {thai}
+        </span>
         {reading.rom ? <Romanization rom={reading.rom} inline /> : null}
         <span className="ru">{reading.ru}</span>
-        {onSpeak && reading.status !== "sign" ? (
-          <HearButtons
-            alone={reading.alone}
-            word={reading.phrase}
-            onSpeak={onSpeak}
-            compact
-            inLabel={reading.status === "letter" ? "в слове" : "в фразе"}
-          />
-        ) : null}
       </span>,
     )
   })

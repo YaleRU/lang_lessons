@@ -8,7 +8,25 @@ export function CheatSheet({ onSpeak }: { onSpeak: (text: string) => void }) {
   return (
     <>
       <p className="muted">Схемы, буквы и звук. Тон стоит на гласной.</p>
-      <h2>Как читать запись</h2>
+      <nav className="sheet-toc" aria-label="Разделы шпаргалки">
+        {[
+          ["sheet-reading", "Как читать запись"],
+          ["sheet-schemas", "Схемы"],
+          ["sheet-consonants", "Согласные"],
+          ["sheet-vowels", "Гласные"],
+          ["sheet-voice", "Голос на iPhone"],
+        ].map(([id, label]) => (
+          <button
+            key={id}
+            type="button"
+            className="speak"
+            onClick={() => document.getElementById(id)?.scrollIntoView({ block: "start" })}
+          >
+            {label}
+          </button>
+        ))}
+      </nav>
+      <h2 id="sheet-reading">Как читать запись</h2>
       <p>Знак тона стоит на гласной. Цвет значит то же самое.</p>
       <table className="ref">
         <tbody>
@@ -26,7 +44,7 @@ export function CheatSheet({ onSpeak }: { onSpeak: (text: string) => void }) {
         </tbody>
       </table>
       <p>Две одинаковые буквы — долгий гласный: a коротко, aa долго. Конечные p, t, k не взрывайте.</p>
-      <h2>Схемы</h2>
+      <h2 id="sheet-schemas">Схемы</h2>
       {SCHEMAS.map((schema) => (
         <section key={schema.title}>
           <h2>{schema.title}</h2>
@@ -41,16 +59,16 @@ export function CheatSheet({ onSpeak }: { onSpeak: (text: string) => void }) {
           ))}
         </section>
       ))}
-      <h2>Согласные</h2>
+      <h2 id="sheet-consonants">Согласные</h2>
       <p className="muted">Слог буквы: живой слог без знака. Высокий класс даёт восходящий тон, средний и низкий — средний.</p>
       {CONSONANTS.map((letter) => (
         <LetterRow key={letter.th} letter={letter} onSpeak={onSpeak} />
       ))}
-      <h2>Гласные</h2>
+      <h2 id="sheet-vowels">Гласные</h2>
       {VOWELS.map((letter) => (
         <LetterRow key={letter.th} letter={letter} onSpeak={onSpeak} />
       ))}
-      <h2>Голос на iPhone</h2>
+      <h2 id="sheet-voice">Голос на iPhone</h2>
       <p>Настройки → Универсальный доступ → Проговаривание содержимого → Голоса → Тайский. После загрузки кнопки «отдельно» и «в слове» говорят без интернета.</p>
     </>
   )
@@ -80,7 +98,7 @@ function ToneRow({
       <td>{mark}</td>
       <td className={toneClass === "mid" ? undefined : toneClass}>{tone}</td>
       <td>{voice}</td>
-      <td className="thai">
+      <td className="thai" lang="th">
         {th} <span className={`rom ${toneClass}`}>{rom}</span>
         <HearButtons alone={th} word={word} onSpeak={onSpeak} />
       </td>
@@ -98,7 +116,9 @@ function SchemaRow({
   return (
     <article className="word">
       <div className="ru">{line.label}</div>
-      <div className="thai">{line.th}</div>
+      <div className="thai" lang="th">
+        {line.th}
+      </div>
       <Romanization rom={line.rom} />
       <div className="ru">{line.ru}</div>
       <HearButtons alone={line.alone} word={line.word} onSpeak={onSpeak} />
@@ -115,13 +135,17 @@ function LetterRow({
 }) {
   return (
     <article className="word">
-      <div className="thai">{letter.th}</div>
+      <div className="thai" lang="th">
+        {letter.th}
+      </div>
       <Romanization rom={letter.rom} />
       <div className="ru">{letter.ru}</div>
       <div className="how">
         <Readable text={letter.how} onSpeak={onSpeak} />
       </div>
-      <div className="thai" style={{ fontSize: "1.15rem" }}>{letter.word}</div>
+      <div className="thai" lang="th" style={{ fontSize: "1.15rem" }}>
+        {letter.word}
+      </div>
       <Romanization rom={letter.wordRom} />
       <HearButtons alone={letter.alone} word={letter.word} onSpeak={onSpeak} />
     </article>
